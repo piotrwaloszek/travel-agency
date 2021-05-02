@@ -10,15 +10,19 @@ const createActionName = name => `app/${reducerName}/${name}`;
 
 // action types
 export const CHANGE_PHRASE = createActionName('CHANGE_PHRASE');
-export const CHANGE_DURATION = createActionName('CHANGE_DURATION');
-export const CHANGE_TAG = createActionName('CHANGE_TAG');
 // TODO - add other action types
+export const ADD_TAG = createActionName('ADD_TAG');
+export const REMOVE_TAG = createActionName('REMOVE_TAG');
+export const CHANGE_DURATION_FROM =createActionName('CHANGE_DURATION_FROM');
+export const CHANGE_DURATION_TO =createActionName('CHANGE_DURATION_TO');
 
 // action creators
 export const changeSearchPhrase = payload => ({ payload, type: CHANGE_PHRASE });
-export const changeDuration = payload => ({ payload, type: CHANGE_DURATION });
-export const changeTag = payload => ({ payload, type: CHANGE_TAG });
 // TODO - add other action creators
+export const addTag = payload =>({ payload, type: ADD_TAG});
+export const removeTag = payload =>({ payload, type: REMOVE_TAG});
+export const changeDurationTimeFrom = payload =>({ payload, type: CHANGE_DURATION_FROM});
+export const changeDurationTimeTo = payload =>({ payload, type: CHANGE_DURATION_TO});
 
 // reducer
 export default function reducer(statePart = [], action = {}) {
@@ -28,20 +32,33 @@ export default function reducer(statePart = [], action = {}) {
         ...statePart,
         searchPhrase: action.payload,
       };
-    case CHANGE_DURATION:
+    // TODO - handle other action types
+    case CHANGE_DURATION_FROM:
       return {
         ...statePart,
         duration: {
-          from: action.payload.type === 'from' && +action.payload.value <= +statePart.duration.to ? action.payload.value : statePart.duration.from,
-          to: action.payload.type === 'to' && +action.payload.value >= +statePart.duration.from ? action.payload.value : statePart.duration.to,
+          ...statePart.duration,
+          from: action.payload,
         },
       };
-    case CHANGE_TAG:
+    case CHANGE_DURATION_TO:
       return {
         ...statePart,
-        tags: action.payload.checked ? [ ...statePart.tags, action.payload.tag] : statePart.tags.filter(tag => tag != action.payload.tag),
+        duration: {
+          ...statePart.duration,
+          to: action.payload,
+        },
       };
-    // TODO - handle other action types
+    case ADD_TAG:
+      return {
+        ...statePart,
+        tags: [...statePart.tags, action.payload],
+      };
+    case REMOVE_TAG:
+      return {
+        ...statePart,
+        tags: [...statePart.tags.filter((tag) => tag !== action.payload)],
+      };
     default:
       return statePart;
   }
